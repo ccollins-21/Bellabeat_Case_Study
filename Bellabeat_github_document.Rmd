@@ -1,0 +1,120 @@
+---
+title: "Bellabeats Case Study"
+author: "Christian Collins"
+date: "2024-05-13"
+output: github_document
+---
+
+## About Bellabeat
+  Urška Sršen and Sando Mur founded Bellabeat, a high-tech company that manufactures health-focused smart products. Sršen used her background as an artist to develop beautifully designed technology that informs and inspires women around the world. Collecting data on activity, sleep, stress, and reproductive health has allowed Bellabeat to empower women with knowledge about their own health and habits. Since it was founded in 2013, Bellabeat has grown rapidly and quickly positioned itself as a tech-driven wellness company for women.
+
+## Business Task
+  Sršen asks you to analyze smart device usage data in order to gain insight into how consumers use non-Bellabeat smart devices. These questions will guide my analysis:
+ 1. What are some trends in smart device usage?
+ 2. How could these trends apply to Bellabeat customers?
+ 3. How could these trends help influence Bellabeat marketing strategy?
+ 
+First, I want to find additional data as the [data](https://www.kaggle.com/datasets/arashnic/fitbit) provided to me, had a small sample size. I found additional data [here](https://dataverse.no/dataset.xhtml?persistentId=doi:10.18710/TGGCSZ).
+
+## Preparing Data in SQL
+After I uploaded the two datasets I began getting to know the data with the preview tab in BigQuery. Then I ran some basic queries to see if the entries match the data description
+```{r}
+knitr::include_graphics('/cloud/project/Bellabeat_Additional_Data_Id_Count.PNG')
+knitr::include_graphics('/cloud/project/Bellabeat_Sleep_Distinct_Id.PNG')
+```
+
+Next, I noticed from previewing the tables that the columns contain the same type of information, but different column names. I confirmed this with the read.me files that came with the dataverse.no dataset. Also, part of this data was collected during COVID. This would skew the results of this data if I left those dates in, because people where in lockdown during this time. So, to fix the formatting and filter out the dates I did not want, I ran the following query:
+```{r}
+knitr::include_graphics('/cloud/project/Bellabeat_Filter_Data_02.PNG')
+```
+
+Now that the tables have the same formant I can merge the two with a `JOIN` statement:
+```{r}
+knitr::include_graphics('/cloud/project/Bellabeat_Merging_Datasets_02.PNG')
+```
+
+The results show a lot of null values after I merged the datasets. I can use `COALESCE` to solve this:
+```{r}
+knitr::include_graphics('/cloud/project/Bellabeat_Coalesce.png')
+```
+
+This looks a lot better, however I want to double check. I can spot check data using the following query and have a split tab open of the dataset before it was merged to make sure the data aligns:
+```{r}
+knitr::include_graphics('/cloud/project/Bellabeat_Spot_Checking.PNG')
+```
+
+## Moving to R
+Notes: setting up my R environment by uploading the relevant data, installing and loading the `tidyverse` and `janitor` packages:
+
+```{r loading tidy verse package}
+install.packages("tidyverse")
+install.packages("janitor")
+library(tidyverse)
+library(janitor)
+```
+
+## Preparing and Processing the Data in R
+
+  After I imported the data into R I ran the following code to create data frames:
+
+```{r creating data frames to work with}
+smart_device_users <- read_csv('/cloud/project/smart_device_users.csv')
+sleep_df <- read_csv('/cloud/project/sleep_dates_formatted.csv')
+```
+I have already gotten familiar with this data in SQL, but I can use `glimpse` here to gain an understanding of the data if I hadn't:
+```{r}
+glimpse(smart_device_users)
+glimpse(sleep_df)
+```
+
+If I'd like a deeper understanding with some statistics I can use `summary`:
+```{r}
+summary(smart_device_users)
+summary(sleep_df)
+```
+
+Something to note is that the average person took 9,213 steps and those who recorded sleep data slept an average of 419 minutes, or 6.98 hours.
+
+
+## Exploratory Data Analysis in R
+  First, I'd like to see the relationship between activity and calories burned:
+```{r}
+ggplot(smart_device_users, aes(x=VeryActiveMinutes, y=Calories))+geom_point()+geom_smooth(method=lm, se=FALSE)+labs(title= "Calories Burned vs. Very Active Minutes", x="Very Active Minutes", caption = "Data collected from user 'Mobius' on Kaggle.com and The Artic University of Norway on dataverse.no")
+
+ggplot(smart_device_users, aes(x=FairlyActiveMinutes, y=Calories))+geom_point()+geom_smooth(method=lm, se=FALSE)+labs(title = "Calories Burned vs Fairly Active Minutes", x="Fairly Active Minutes", caption = "Data collected from user 'Mobius' on Kaggle.com and The Artic University of Norway on dataverse.no")
+
+ggplot(smart_device_users, aes(x=LightlyActiveMinutes, y=Calories))+geom_point()+geom_smooth(method=lm, se=FALSE)+labs(title = "Calories Burned vs Lightly Active Minutes", x="Lightly Active Minutes", caption = "Data collected from user 'Mobius' on Kaggle.com and The Artic University of Norway on dataverse.no")
+
+ggplot(smart_device_users, aes(x=SedentaryMinutes, y=Calories))+geom_point()+geom_smooth(method=lm, se=FALSE)+labs(title = "Calories Burned vs Sedentary Minutes", x="Sedentary Minutes", caption = "Data collected from user 'Mobius' on Kaggle.com and The Artic University of Norway on dataverse.no")
+```
+
+Graphing all four categories of activity levels I can see that the more active these participants were, the stronger correlation between the activity and calories they burned was. This may be obvious, but checking the data confirms it.
+
+Now that I can see there is a positive correlation between more activity and calories burned, I will see if there is a pattern that more sleep leads to more activity.
+
+First, I need to merge the sleep data with the activity data so that I can plot both data on the same graph. I will merge them using the keys `Id` and `ActivityDate`, so the the correct sleep data merges with the corresponding activity data. I need to use both here, because if I were to just use `Id` the dates may not align leading to skewed results.
+```{r}
+total_data <- merge(smart_device_users, sleep_df, by=c("Id","ActivityDate"))
+head(total_data)
+```
+
+Now that everything I need is in one place and looks good, I can begin to plot the data to show the relationship between sleep and activity levels:
+```{r}
+ggplot(total_data, aes(x=TotalMinutesAsleep, y=VeryActiveMinutes))+geom_point()+labs(title = "Sleep vs High Activity", x="Total Minutes Asleep", y="Very Active Minutes", caption = "Data collected from user 'Mobius' on Kaggle.com")
+
+ggplot(total_data, aes(x=TotalMinutesAsleep, y=FairlyActiveMinutes))+geom_point()+labs(title = "Sleep vs Moderate Activity", x="Total Minutes Asleep", y="Fairly Active Minutes", caption = "Data collected from user 'Mobius' on Kaggle.com")
+
+ggplot(total_data, aes(x=TotalMinutesAsleep, y=LightlyActiveMinutes))+geom_point()+labs(title = "Sleep vs Light Activity", x="Total Minutes Asleep", y="Lightly Active Minutes", caption = "Data collected from user 'Mobius' on Kaggle.com")
+
+ggplot(total_data, aes(x=TotalMinutesAsleep, y=SedentaryMinutes))+geom_point()+geom_smooth(method=lm, se=FALSE) +labs(title = "Sleep vs Time Sedentary", x="Total Minutes Asleep", y="Sedentary Minutes", caption = "Data collected from user 'Mobius' on Kaggle.com")
+```
+
+There seems to be strong correlation between sleeping more and being less sedentary throughout the day!
+Also the people who had the most "Very Active" and "Fairly Active" minutes, slept between 390 min. and 540 min. or 6.5 - 9 hours. However, this could just be that the majority of people sleep for this amount of time. As we noted earlier the average time asleep was 6.98 hours.It's important to remember that the sample size for this sleep data is very small at only 24 participants. More data would be needed for a stronger more complete analysis.  
+
+
+## Conclusion
+  The data collected showed a pattern that the more active someone is the more calories they burn. Also, that there was a strong correlation between sleeping more and being less sedentary! People who slept 6.5 - 9 hours spent the most time being active, but it is important to remember the limitations of this data and that more data would be needed for a better analysis. This shows that sleeping for the recommended time of 7-8 hours, as recommended from the National Institutes of Health, could help your fitness goals of losing weight since, in these participants, sleeping the recommended amount lead to higher activity time, and higher activity time lead to more calories being burnt!
+
+## Recommendations
+  Based on the data I recommend that Bellabeat markets to its customers something along the lines of, "data shows that getting the recommended hours of sleep at night could lead to being more active throughout the day, which may help you with your fitness goals. Your Leaf and Time smartwatch, from Bellabeat, will automatically track your night-time sleep. Since this is done automatically, there is no need for you to tell the device that you are going to sleep or put it in any kind of sleep mode. Reach your fitness goals easier with Bellabeat."
