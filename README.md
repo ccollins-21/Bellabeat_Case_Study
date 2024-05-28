@@ -268,7 +268,7 @@ ggplot(smart_device_users, aes(x=LightlyActiveMinutes, y=Calories))+geom_point()
 ![](Bellabeat_github_document_files/figure-gfm/unnamed-chunk-8-3.png)<!-- -->
 
 ``` r
-ggplot(smart_device_users, aes(x=SedentaryMinutes, y=Calories))+geom_point()+labs(title = "Calories Burned vs Sedentary Minutes", x="Sedentary Minutes", caption = "Data collected from user 'Mobius' on Kaggle.com and The Artic University of Norway on dataverse.no")
+ggplot(smart_device_users, aes(x=SedentaryMinutes, y=Calories))+geom_point()+geom_smooth(method=lm, se=FALSE)+labs(title = "Calories Burned vs Sedentary Minutes", x="Sedentary Minutes", caption = "Data collected from user 'Mobius' on Kaggle.com and The Artic University of Norway on dataverse.no")
 ```
 
     ## `geom_smooth()` using formula = 'y ~ x'
