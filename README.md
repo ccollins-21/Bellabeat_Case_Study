@@ -68,7 +68,7 @@ knitr::include_graphics('/cloud/project/Bellabeat_Merging_Datasets_02.PNG')
 
 ![](Bellabeat_Merging_Datasets_02.PNG)<!-- -->
 
-The results show a lot of null values after I merged the datasets. I can
+The results show a lot of null values after I merged the datasets, because of duplicated columns. I can
 use `COALESCE` to solve this:
 
 ``` r
