@@ -375,7 +375,7 @@ Based on the data I recommend that Bellabeat markets to its customers
 something along the lines of, “data shows that getting the recommended
 hours of sleep at night could lead to being more active throughout the
 day, which may help you with your fitness goals. Our Leaf and Time
-smartwatch, from Bellabeat, will automatically track your night-time
+smartwatch, from Bellabeat, will not only track your physcial activity throughout the day, but also will **automatically** track your night-time
 sleep. Since this is done automatically, there is no need for you to
 tell the device that you are going to sleep or put it in any kind of
-sleep mode, making it so easy to track and manage your sleep. Reach your fitness goals easier with Bellabeat.”
+sleep mode, making it easy to track and manage your sleep. Our watches automatic sleep tracking feature, alongside its activity tracker, makes the struggle having to manually input everything effortless. After all, you may not even track it right, or worse, you forget. Never lose track again with your Bellabeat.”
