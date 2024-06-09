@@ -373,7 +373,7 @@ activity time lead to more calories being burnt!
 
 Based on the data I recommend that Bellabeat markets to its customers
 something along the lines of, “data shows that getting the recommended
-hours of sleep at night could lead to being more active throughout the
+7-8 hours of sleep at night could lead to being more active throughout the
 day, which may help you with your fitness goals. Our Leaf and Time
 smartwatch, from Bellabeat, will not only track your physcial activity throughout the day, but also will **automatically** track your night-time
 sleep. Since this is done automatically, there is no need for you to
